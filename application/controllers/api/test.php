@@ -1,6 +1,13 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+use Restserver\Libraries\REST_Controller;
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-require APPPATH . '/libraries/REST_Controller.php';
+// This can be removed if you use __autoload() in config.php OR use Modular Extensions
+/** @noinspection PhpIncludeInspection */
+//To Solve File REST_Controller not found
+require APPPATH . 'libraries/REST_Controller.php';
+require APPPATH . 'libraries/Format.php';
+
 include_once 'aliyun-openapi-php-sdk-master/aliyun-php-sdk-core/Config.php';
 use \Iot\Request\V20180120 as Iot;
 
@@ -9,9 +16,8 @@ use \Iot\Request\V20180120 as Iot;
 * @author Vim Ji <ctc_business@163.com>
 * Date Created: 2018-10-03
 */
-class Test extends REST_Controller
-{
-  
+class Test extends REST_Controller {
+
   function __construct()
   {
     parent::__construct();
@@ -40,10 +46,12 @@ class Test extends REST_Controller
     $response = $client->getAcsResponse($request);
     // print_r($response);
 
-    'status' => '200',
-    'message' => $response,
+    $message = [
+      'status' => '200',
+      'message' => $response
+    ];
 
-    $this->response($message, $message['status']);
+    $this->set_response($message, $message['status']);
 
     // $remember = FALSE;
 
@@ -63,7 +71,7 @@ class Test extends REST_Controller
     //   // success
     //   $user = $this->users->get_user_by_login($login);
     //   unset($user->password);
-      
+
     //   $user_phone = $this->user_third->select_user_phone($user->id);
     //   //$user_email = $this->user_third->select_user_email($user->id);
     //   $user_bonus = $this->user_third->select_user_bonus($user_phone,$user->id);
@@ -74,7 +82,7 @@ class Test extends REST_Controller
     //   $this->user_tokens->delete($user->id);
 
     //   $token = md5(microtime().rand());
-      
+
     //   $user_token = array(
     //     'user_id' => $user->id,
     //     'token' => $token,
@@ -420,18 +428,18 @@ class Test extends REST_Controller
  //      ) {
  //        $user_mobile_account_data['bonus_balance'] = $location_incentive_program->amount;
  //      }
-      
+
  //      //When SMS is closed, determine the location and give the user bonus.
- //      $sms_verification = $this->variables->get('sms_verification')->value;    
+ //      $sms_verification = $this->variables->get('sms_verification')->value;
  //      if(empty(trim($phone))
- //        && $sms_verification == 'close' 
- //        && !is_null($location_incentive_program = $this->incentive_program_model->get_via_location_id($location->id)) 
- //        && !$location_incentive_program->disabled 
+ //        && $sms_verification == 'close'
+ //        && !is_null($location_incentive_program = $this->incentive_program_model->get_via_location_id($location->id))
+ //        && !$location_incentive_program->disabled
  //        && ($location_incentive_program->expire_date == 0 || date('Y-m-d', strtotime($location_incentive_program->expire_date)) >= date('Y-m-d', time('today')))
  //      ) {
  //         $user_mobile_account_data['bonus_balance'] = $location_incentive_program->amount;
  //         $user_profiles_mark = $this->referral_program_model->update_user_profiles($data['user_id']);
- //      }  
+ //      }
 
  //      $this->db->insert('user_mobile_account', $user_mobile_account_data);
 
@@ -439,15 +447,15 @@ class Test extends REST_Controller
  //      if($referred_code && $phone)
  //      {
  //            $referred_info = $this->referral_program_model->find_sms_code($phone,$referred_code); //查询用户在user_refered_friend表的记录信息
-            
+
  //            if($referred_info)
- //            {  
+ //            {
  //                //add referred amount
- //                $referred_location_bonus = 0; 
+ //                $referred_location_bonus = 0;
  //                $location_info = $this->referral_program_model->get_uln_location_id(trim($location_id));
-                
+
  //                if($location_info)
- //                {       
+ //                {
  //                   $referred_location_bonus = $this->referral_program_model->find_referral_location_amount($location_info->id);
  //                   if(!$referred_location_bonus)
  //                   {
@@ -462,9 +470,9 @@ class Test extends REST_Controller
  //                   $update_user_bonus_res = $this->referral_program_model->update_user_bonus($data['user_id'],$referred_location_bonus);
  //                }else{
  //                   $referral_res = $this->referral_program_model->update_referral_register($referred_code,$phone,$data['user_id']);
- //                }  
- //            }  
- //      } 
+ //                }
+ //            }
+ //      }
 
  //      $data['site_name'] = $this->config->item('website_name', 'tank_auth');
 
@@ -517,7 +525,7 @@ class Test extends REST_Controller
  //      ];
  //      $this->response($message, $message['status']);
  //    }
-    
+
  //    if(empty($country_code) || strlen($phone) < 9) {
  //      $message += [
  //        'status' => REST_Controller::HTTP_BAD_REQUEST,
@@ -646,7 +654,7 @@ class Test extends REST_Controller
  //      if($phone_data->bonus > 0) {
  //        return 3;
  //      }
-  
+
  //      // exist phone number return
  //      // $this->load->model(array('user_profiles','registered_numbers'));
  //      // if($this->user_profiles->get_exist_phone($phone) || $this->registered_numbers->get_exist_phone($phone)){
@@ -867,7 +875,7 @@ class Test extends REST_Controller
  //            ];
 
  //            $this->response($message, $message['status']);
- //          } 
+ //          }
  //        }
  //      }
  //    } else {
@@ -962,16 +970,16 @@ class Test extends REST_Controller
  //      }
 
  //      //When SMS is closed, determine the location and give the user bonus.
- //      $sms_verification = $this->variables->get('sms_verification')->value;    
+ //      $sms_verification = $this->variables->get('sms_verification')->value;
  //      if(empty(trim($phone))
- //        && $sms_verification == 'close' 
- //        && !is_null($location_incentive_program = $this->incentive_program_model->get_via_location_id($location->id)) 
- //        && !$location_incentive_program->disabled 
+ //        && $sms_verification == 'close'
+ //        && !is_null($location_incentive_program = $this->incentive_program_model->get_via_location_id($location->id))
+ //        && !$location_incentive_program->disabled
  //        && ($location_incentive_program->expire_date == 0 || date('Y-m-d', strtotime($location_incentive_program->expire_date)) >= date('Y-m-d', time('today')))
  //      ) {
  //         $user_mobile_account_data['bonus_balance'] = $location_incentive_program->amount;
  //         $user_profiles_mark = $this->referral_program_model->update_user_profiles($data['user_id']);
- //      }  
+ //      }
 
  //      $this->db->insert('user_mobile_account', $user_mobile_account_data);
 
@@ -980,17 +988,17 @@ class Test extends REST_Controller
  //            $referred_info = $this->referral_program_model->find_sms_code($phone,$referred_code); //查询用户在user_refered_friend表的记录信息
 
  //            if($referred_info)
- //            {  
+ //            {
  //                //add referred amount
- //                $referred_location_bonus = 0; 
-             
- //                $location_info = $this->referral_program_model->get_uln_location_id(trim($location_id));   
+ //                $referred_location_bonus = 0;
+
+ //                $location_info = $this->referral_program_model->get_uln_location_id(trim($location_id));
 
  //                if($location_info)
- //                {       
+ //                {
  //                    $referred_locat_bonus    = $this->referral_program_model->find_referring_location_amount($location_info->id);
  //                    $referred_group_bonus    = $this->referral_program_model->get_referring_group($location_info->id);
-                    
+
  //                    if($referred_locat_bonus && $referred_group_bonus){
  //                       $referred_location_bonus = strtotime($referred_locat_bonus->date_added) > strtotime($referred_group_bonus->date_added) ? $referred_locat_bonus->referred_bonus : $referred_group_bonus->referred_bonus;
  //                    }else{
@@ -1005,8 +1013,8 @@ class Test extends REST_Controller
  //                   $update_user_bonus_res = $this->referral_program_model->update_user_bonus($data['user_id'],$referred_location_bonus);
  //                }else{
  //                   $referral_res = $this->referral_program_model->update_referral_register($referred_code,$phone,$data['user_id']);
- //                }  
- //            }  
+ //                }
+ //            }
  //      }
 
  //      $data['site_name'] = $this->config->item('website_name', 'tank_auth');
@@ -1145,14 +1153,14 @@ class Test extends REST_Controller
 
  //  public function third_login_post()
  //  {
-    
+
  //    $userid   = $this->post('userid');
  //    $name     = $this->post('name');
  //    $nickname = $this->post('nickname');
  //    $email    = $this->post('email');
  //    $img      = $this->post('img');
  //    $source   = $this->post('source');
- 
+
  //    if (!$userid || !$name || !$source) {
  //      $message = [
  //        'status' => REST_Controller::HTTP_BAD_REQUEST,
@@ -1161,7 +1169,7 @@ class Test extends REST_Controller
 
  //      $this->response($message, $message['status']);
  //    }
-    
+
  //    $res = $this->user_third->get_third_id($userid, $source);
 
  //    if(!isset($res[0]->uid))
@@ -1191,11 +1199,11 @@ class Test extends REST_Controller
  //          ];
 
  //          $this->response($message, $message['status']);
- //         }else{ 
+ //         }else{
  //            $user = $this->user_third->get_third_uids($res[0]->userid);
  //         }
  //    }
-    
+
  //    $message = $this->make_login_info($user);
  //    $this->response($message, $message['status']);
  //  }
@@ -1223,7 +1231,7 @@ class Test extends REST_Controller
 
  //    $suite = $this->post('suite') ? $this->post('suite') : '';
  //    $alert = $this->post('alert') ? $this->post('alert') : 0;
-    
+
  //    $country_code = preg_replace('/\D/', '', $this->post('country_code'));
  //    $phone = preg_replace('/\D/', '', $this->post('phone'));
  //    $referred_code = $this->post('referred_code') ? $this->post('referred_code') : '';
@@ -1351,7 +1359,7 @@ class Test extends REST_Controller
  //            ];
 
  //            $this->response($message, $message['status']);
- //          } 
+ //          }
  //        }
  //      }
  //    } else {
@@ -1404,10 +1412,10 @@ class Test extends REST_Controller
  //    // validation over, create resident user now.
  //    if (!is_null($data = $this->tank_auth->create_user($username, $email, $password='FFFFFF', $email_activation))) {
  //      unset($data['password']); // Clear password (just for any case)
-      
+
  //      if(isset($data['user_id']) and isset($userid)){
  //        $res = $this->user_third->update_third_info_api($userid,$data['user_id']);
- //      } 
+ //      }
 
  //      // update user profile after user created.
  //      $update_data = array(
@@ -1452,23 +1460,23 @@ class Test extends REST_Controller
  //      $this->db->insert('user_mobile_account', $user_mobile_account_data);
 
  //      //update referral register data
-      
+
  //      if($referred_code && $phone)
  //      {
  //            $referred_info = $this->referral_program_model->find_sms_code($phone,$referred_code); //查询用户在user_refered_friend表的记录信息
 
  //            if($referred_info)
- //            {  
+ //            {
  //                //add referred amount
- //                $referred_location_bonus = 0; 
-             
- //                $location_info = $this->referral_program_model->get_uln_location_id(trim($location_id));   
+ //                $referred_location_bonus = 0;
+
+ //                $location_info = $this->referral_program_model->get_uln_location_id(trim($location_id));
 
  //                if($location_info)
- //                {       
+ //                {
  //                    $referred_locat_bonus    = $this->referral_program_model->find_referring_location_amount($location_info->id);
  //                    $referred_group_bonus    = $this->referral_program_model->get_referring_group($location_info->id);
-                    
+
  //                    if($referred_locat_bonus && $referred_group_bonus){
  //                       $referred_location_bonus = strtotime($referred_locat_bonus->date_added) > strtotime($referred_group_bonus->date_added) ? $referred_locat_bonus->referred_bonus : $referred_group_bonus->referred_bonus;
  //                    }else{
@@ -1483,8 +1491,8 @@ class Test extends REST_Controller
  //                   $update_user_bonus_res = $this->referral_program_model->update_user_bonus($data['user_id'],$referred_location_bonus);
  //                }else{
  //                   $referral_res = $this->referral_program_model->update_referral_register($referred_code,$phone,$data['user_id']);
- //                }  
- //            }  
+ //                }
+ //            }
  //      }
 
 
@@ -1505,7 +1513,7 @@ class Test extends REST_Controller
  //          }
  //        }
  //      }
-     
+
  //      /*
  //      $message = [
  //        'status' => REST_Controller::HTTP_OK,
@@ -1610,4 +1618,3 @@ class Test extends REST_Controller
  //  }
 
 }
-
