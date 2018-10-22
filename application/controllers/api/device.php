@@ -16,7 +16,7 @@ use \Iot\Request\V20180120 as Iot;
 * @author Vim Ji <ctc_business@163.com>
 * Date Created: 2018-10-03
 */
-class device extends REST_Controller {
+class Device extends REST_Controller {
 
   function __construct()
   {

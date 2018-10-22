@@ -14,7 +14,7 @@ require APPPATH . 'libraries/Format.php';
 * @author Vim Ji <ctc_business@163.com>
 * Date Created: 2018-10-20
 */
-class downloader extends REST_Controller {
+class Downloader extends REST_Controller {
 
   function __construct()
   {
