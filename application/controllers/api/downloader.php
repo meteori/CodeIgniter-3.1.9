@@ -21,18 +21,18 @@ class downloader extends REST_Controller {
     parent::__construct();
 
     $this->load->helper('url');
-	$this->load->helper('download');//加载插件
+  	$this->load->helper('download');//加载插件
   }
 
   public function get_firmware_get()
   {
-	$filename = $this->get('filename');
-     	
+  	$filename = $this->get('filename');
+       	
 
-	$fullpath = 'static/downloads/'.$filename;
-	// print_r(base_url().'static/downloads/Period_fail.mp4');
-	$data = file_get_contents(base_url().$fullpath);//打开文件读取其中的内容
-	force_download($filename,$data);//下载
+  	$fullpath = 'static/downloads/'.$filename;
+  	// print_r(base_url().'static/downloads/Period_fail.mp4');
+  	$data = file_get_contents(base_url().$fullpath);//打开文件读取其中的内容
+  	force_download($filename,$data);//下载
   }
 
 }
