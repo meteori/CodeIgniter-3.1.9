@@ -113,8 +113,15 @@ class Device extends REST_Controller {
 
     $request = new Iot\PubRequest();
     $request->setProductKey("a1dSHKlSbBX");
-    // $request->setMessageContent("SGVsbG8lMkMlMjBMaW5jb2xuLg=="); //hello world Base64 String.
-    $request->setMessageContent(base64_encode("hello world 1")); //hello world Base64 String.
+
+    // {
+    //   "cmd": "ota",
+    //   "para": {
+    //     "url": "https://www.anlun.online/api/Downloader/get_firmware?filename=jp1.png"
+    //   }
+    // }    
+    $request->setMessageContent("ewoJImNtZCI6ICJvdGEiLAoJInBhcmEiOiB7CgkJInVybCI6ICJodHRwczovL3d3dy5hbmx1bi5vbmxpbmUvYXBpL0Rvd25sb2FkZXIvZ2V0X2Zpcm13YXJlP2ZpbGVuYW1lPWpwMS5wbmciCgl9Cn0=");
+
     $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
     $response = $client->getAcsResponse($request);
     // print_r($response);
@@ -128,4 +135,31 @@ class Device extends REST_Controller {
 
   }
 
+ public function check_machine_status_post()
+  {
+    $wx_username = $this->post('wx_username');
+
+    //设置你的AccessKeyId/AccessSecret/ProductKey
+    $accessKeyId = "LTAIwOrIrQK8GLc2";
+    $accessSecret = "kQ07a09Bm72qgAfLivTlxXhGfv2JDC";
+    $iClientProfile = DefaultProfile::getProfile("cn-shanghai", $accessKeyId, $accessSecret);
+    $client = new DefaultAcsClient($iClientProfile);
+
+    $request = new Iot\PubRequest();
+    $request->setProductKey("a1dSHKlSbBX");
+  
+    $request->setMessageContent("Y2hlY2sgbWFjaGluZSBzdGF0dXM=");  //check machine status
+
+    $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
+    $response = $client->getAcsResponse($request);
+    // print_r($response);
+
+    $message = [
+      'status' => '200',
+      'message' => $response
+    ];
+
+    $this->set_response($message, $message['status']);
+
+  }
 }
