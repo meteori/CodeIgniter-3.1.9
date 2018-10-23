@@ -22,6 +22,7 @@ class Device extends REST_Controller {
   {
     parent::__construct();
 
+    $this->load->helper('url');
     // $this->load->model(array('tank_auth/users', 'locations_model', 'incentive_program_model', 'card_balance', 'user_tokens', 'user_mobile_account', 'variables'));
     // $this->load->model(array('user_third','referral_program_model','user_profiles'));
     // $this->load->library('tank_auth');
@@ -33,6 +34,18 @@ class Device extends REST_Controller {
     $wx_username = $this->post('wx_username');
     $duration = $this->post('duration');
 
+    if (empty($wx_username) or empty($duration))
+    {
+      $message = [
+        'status' => '201',
+        'wx_username' => $wx_username,
+        'duration' => $duration
+      ];
+
+      $this->set_response($message, $message['status']);
+      return;
+    }
+
     //设置你的AccessKeyId/AccessSecret/ProductKey
     $accessKeyId = "LTAIwOrIrQK8GLc2";
     $accessSecret = "kQ07a09Bm72qgAfLivTlxXhGfv2JDC";
@@ -43,14 +56,15 @@ class Device extends REST_Controller {
     $request->setProductKey("a1dSHKlSbBX");
 
 
-    // {
-    //   "cmd": "switch",
-    //   "para": {
-    //     "action": "on",
-    //     "time": 11
-    //   }
-    // }    
-    $request->setMessageContent("ewoJImNtZCI6ICJzd2l0Y2giLAoJInBhcmEiOiB7CgkJImFjdGlvbiI6ICJvbiIsCgkJInRpbWUiOiAxMQoJfQp9");
+    $content = [
+      'cmd' => 'switch',
+      'para' => [
+        'action' => 'on',
+        'time' => $duration
+      ]
+    ];
+
+    $request->setMessageContent(base64_encode(json_encode($content)));
 
     $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
     $response = $client->getAcsResponse($request);
@@ -58,6 +72,8 @@ class Device extends REST_Controller {
 
     $message = [
       'status' => '200',
+      'wx_username' => $wx_username,
+      'duration' => $duration,
       'message' => $response
     ];
 
@@ -68,6 +84,16 @@ class Device extends REST_Controller {
   public function close_machine_post()
   {
     $wx_username = $this->post('wx_username');
+    if (empty($wx_username))
+    {
+      $message = [
+        'status' => '201',
+        'wx_username' => $wx_username
+      ];
+
+      $this->set_response($message, $message['status']);
+      return;
+    }
 
     //设置你的AccessKeyId/AccessSecret/ProductKey
     $accessKeyId = "LTAIwOrIrQK8GLc2";
@@ -78,13 +104,14 @@ class Device extends REST_Controller {
     $request = new Iot\PubRequest();
     $request->setProductKey("a1dSHKlSbBX");
 
-    // {
-    //   "cmd": "switch",
-    //   "para": {
-    //     "action": "off"
-    //   }
-    // }    
-    $request->setMessageContent("ewoJImNtZCI6ICJzd2l0Y2giLAoJInBhcmEiOiB7CgkJImFjdGlvbiI6ICJvZmYiCgl9Cn0="); 
+    $content = [
+      'cmd' => 'switch',
+      'para' => [
+        'action' => 'off'
+      ]
+    ];
+
+    $request->setMessageContent(base64_encode(json_encode($content)));
 
     $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
     $response = $client->getAcsResponse($request);
@@ -92,6 +119,7 @@ class Device extends REST_Controller {
 
     $message = [
       'status' => '200',
+      'wx_username' => $wx_username,
       'message' => $response
     ];
 
@@ -103,7 +131,17 @@ class Device extends REST_Controller {
   {
     $wx_username = $this->post('wx_username');
     $firmware_name = $this->post('firmware_name');
- 
+    if (empty($wx_username) or empty($firmware_name))
+    {
+      $message = [
+        'status' => '201',
+        'wx_username' => $wx_username,
+        'firmware_name' => $firmware_name
+      ];
+
+      $this->set_response($message, $message['status']);
+      return;
+    }
 
     //设置你的AccessKeyId/AccessSecret/ProductKey
     $accessKeyId = "LTAIwOrIrQK8GLc2";
@@ -114,13 +152,15 @@ class Device extends REST_Controller {
     $request = new Iot\PubRequest();
     $request->setProductKey("a1dSHKlSbBX");
 
-    // {
-    //   "cmd": "ota",
-    //   "para": {
-    //     "url": "https://www.anlun.online/api/Downloader/get_firmware?filename=jp1.png"
-    //   }
-    // }    
-    $request->setMessageContent("ewoJImNtZCI6ICJvdGEiLAoJInBhcmEiOiB7CgkJInVybCI6ICJodHRwczovL3d3dy5hbmx1bi5vbmxpbmUvYXBpL0Rvd25sb2FkZXIvZ2V0X2Zpcm13YXJlP2ZpbGVuYW1lPWpwMS5wbmciCgl9Cn0=");
+    $url = base_url()."api/Downloader/get_firmware?filename=".$firmware_name;
+    $content = [
+      'cmd' => 'ota',
+      'para' => [
+        'url' => $url
+      ]
+    ];
+
+    $request->setMessageContent(base64_encode(json_encode($content)));
 
     $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
     $response = $client->getAcsResponse($request);
@@ -128,6 +168,8 @@ class Device extends REST_Controller {
 
     $message = [
       'status' => '200',
+      'wx_username' => $wx_username,
+      'firmware_name' => $firmware_name,
       'message' => $response
     ];
 
@@ -138,6 +180,16 @@ class Device extends REST_Controller {
  public function check_machine_status_post()
   {
     $wx_username = $this->post('wx_username');
+    if (empty($wx_username))
+    {
+      $message = [
+        'status' => '201',
+        'wx_username' => $wx_username
+      ];
+
+      $this->set_response($message, $message['status']);
+      return;
+    }
 
     //设置你的AccessKeyId/AccessSecret/ProductKey
     $accessKeyId = "LTAIwOrIrQK8GLc2";
@@ -156,6 +208,7 @@ class Device extends REST_Controller {
 
     $message = [
       'status' => '200',
+      'wx_username' => $wx_username,
       'message' => $response
     ];
 

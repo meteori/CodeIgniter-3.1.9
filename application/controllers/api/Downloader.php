@@ -26,8 +26,7 @@ class Downloader extends REST_Controller {
 
   public function get_firmware_get()
   {
-  	$filename = $this->get('filename');
-       	
+  	$filename = $this->get('filename');  
 
   	$fullpath = 'static/downloads/'.$filename;
   	// print_r(base_url().'static/downloads/Period_fail.mp4');
