@@ -38,4 +38,19 @@ class Welcome extends CI_Controller {
 
 		$this->load->view('welcome_message');
 	}
+
+	public function corporate()
+	{
+		$this->load->view('corporate_website');
+	}
+
+	public function landing()
+	{
+		$this->load->view('landing_page');
+	}
+
+	public function landing_two()
+	{
+		$this->load->view('landing_page_2');
+	}
 }

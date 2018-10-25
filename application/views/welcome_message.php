@@ -82,6 +82,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		<p>If you are exploring CodeIgniter for the very first time, you should start by reading the <a href="user_guide/">User Guide</a>.</p>
 	</div> -->
 
+  <ul>
+    <li><a href="<?php echo base_url('welcome/corporate'); ?>">Corporate Website Demo</a></li>
+    <li><a href="<?php echo base_url('welcome/landing'); ?>">Landing Page Demo</a></li>
+    <li><a href="<?php echo base_url('welcome/landing_two'); ?>">Landing Page Demo 2</a></li>
+  </ul>
+
 	<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds. <?php echo  (ENVIRONMENT === 'development') ?  'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?></p>
 </div>
 
