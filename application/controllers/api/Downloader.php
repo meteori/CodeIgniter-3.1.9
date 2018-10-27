@@ -11,7 +11,7 @@ require APPPATH . 'libraries/Format.php';
 
 /**
 * Auth API.
-* @author Vim Ji <ctc_business@163.com>
+* @author Vim Ji <vim.jxl@gmail.com>
 * Date Created: 2018-10-20
 */
 class Downloader extends REST_Controller {

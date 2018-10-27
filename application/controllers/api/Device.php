@@ -13,7 +13,7 @@ use \Iot\Request\V20180120 as Iot;
 
 /**
 * Auth API.
-* @author Vim Ji <ctc_business@163.com>
+* @author Vim Ji <vim.jxl@gmail.com>
 * Date Created: 2018-10-03
 */
 class Device extends REST_Controller {
@@ -60,7 +60,7 @@ class Device extends REST_Controller {
       'cmd' => 'switch',
       'para' => [
         'action' => 'on',
-        'time' => $duration
+        'time' => (int)$duration
       ]
     ];
 
