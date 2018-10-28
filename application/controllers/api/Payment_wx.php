@@ -274,7 +274,7 @@ class Payment_wx extends REST_Controller {
 
       $message = [
         'status' => '207',
-        'data' => $xml
+        'data' => (string)$xml
       ];
 
       $this->set_response($message, $message['status']);
