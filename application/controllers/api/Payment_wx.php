@@ -345,9 +345,12 @@ class Payment_wx extends REST_Controller {
       $data = "";
       foreach ($index as $key=>$value) {
           if($key == 'xml' || $key == 'XML') continue;
-          $tag = $vals[$value[0]]['tag'];
-          $value = $vals[$value[0]]['value'];
-          $data[$tag] = $value;
+          if(is_array($vals))
+          {
+            $tag = $vals[$value[0]]['tag'];
+            $value = $vals[$value[0]]['value'];
+            $data[$tag] = $value;    
+          }
       }
       return $data;
   }
