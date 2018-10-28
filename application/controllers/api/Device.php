@@ -12,7 +12,7 @@ include_once 'aliyun-openapi-php-sdk-master/aliyun-php-sdk-core/Config.php';
 use \Iot\Request\V20180120 as Iot;
 
 /**
-* Auth API.
+* Device API.
 * @author Vim Ji <vim.jxl@gmail.com>
 * Date Created: 2018-10-03
 */
@@ -23,38 +23,45 @@ class Device extends REST_Controller {
     parent::__construct();
 
     $this->load->helper('url');
-    // $this->load->model(array('tank_auth/users', 'locations_model', 'incentive_program_model', 'card_balance', 'user_tokens', 'user_mobile_account', 'variables'));
-    // $this->load->model(array('user_third','referral_program_model','user_profiles'));
-    // $this->load->library('tank_auth');
-    // $this->lang->load('tank_auth');
+  }
+
+  private function send_message_by_iot($content, $devicename)
+  {
+    //设置你的AccessKeyId/AccessSecret/ProductKey
+    $accessKeyId = $this->config->item('accessKeyId');
+    $accessSecret = $this->config->item('accessSecret');
+    $iClientProfile = DefaultProfile::getProfile("cn-shanghai", $accessKeyId, $accessSecret);
+    $client = new DefaultAcsClient($iClientProfile);
+
+    $request = new Iot\PubRequest();
+    $request->setProductKey($this->config->item('ProductKey'));
+
+    $request->setMessageContent(base64_encode(json_encode($content)));
+
+    $request->setTopicFullName('/'.$this->config->item('ProductKey').'/'.$devicename.'/get'); //消息发送到的Topic全名.
+    $response = $client->getAcsResponse($request);
+    // print_r($response);
+    return $response;
   }
 
   public function start_machine_post()
   {
     $wx_username = $this->post('wx_username');
     $duration = $this->post('duration');
+    $devicename = $this->post('devicename');
 
-    if (empty($wx_username) or empty($duration))
+    if (empty($wx_username) or empty($duration) or empty($devicename))
     {
       $message = [
         'status' => '201',
         'wx_username' => $wx_username,
-        'duration' => $duration
+        'duration' => $duration,
+        'devicename' => $devicename
       ];
 
       $this->set_response($message, $message['status']);
       return;
     }
-
-    //设置你的AccessKeyId/AccessSecret/ProductKey
-    $accessKeyId = "LTAIwOrIrQK8GLc2";
-    $accessSecret = "kQ07a09Bm72qgAfLivTlxXhGfv2JDC";
-    $iClientProfile = DefaultProfile::getProfile("cn-shanghai", $accessKeyId, $accessSecret);
-    $client = new DefaultAcsClient($iClientProfile);
-
-    $request = new Iot\PubRequest();
-    $request->setProductKey("a1dSHKlSbBX");
-
 
     $content = [
       'cmd' => 'switch',
@@ -64,10 +71,7 @@ class Device extends REST_Controller {
       ]
     ];
 
-    $request->setMessageContent(base64_encode(json_encode($content)));
-
-    $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
-    $response = $client->getAcsResponse($request);
+    $response = $this->send_message_by_iot($content,$devicename);
     // print_r($response);
 
     $message = [
@@ -84,25 +88,19 @@ class Device extends REST_Controller {
   public function close_machine_post()
   {
     $wx_username = $this->post('wx_username');
-    if (empty($wx_username))
+    $devicename = $this->post('devicename');
+
+    if (empty($wx_username) or empty($devicename))
     {
       $message = [
         'status' => '201',
-        'wx_username' => $wx_username
+        'wx_username' => $wx_username,
+        'devicename' => $devicename
       ];
 
       $this->set_response($message, $message['status']);
       return;
     }
-
-    //设置你的AccessKeyId/AccessSecret/ProductKey
-    $accessKeyId = "LTAIwOrIrQK8GLc2";
-    $accessSecret = "kQ07a09Bm72qgAfLivTlxXhGfv2JDC";
-    $iClientProfile = DefaultProfile::getProfile("cn-shanghai", $accessKeyId, $accessSecret);
-    $client = new DefaultAcsClient($iClientProfile);
-
-    $request = new Iot\PubRequest();
-    $request->setProductKey("a1dSHKlSbBX");
 
     $content = [
       'cmd' => 'switch',
@@ -111,10 +109,7 @@ class Device extends REST_Controller {
       ]
     ];
 
-    $request->setMessageContent(base64_encode(json_encode($content)));
-
-    $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
-    $response = $client->getAcsResponse($request);
+    $response = $this->send_message_by_iot($content,$devicename);
     // print_r($response);
 
     $message = [
@@ -131,28 +126,23 @@ class Device extends REST_Controller {
   {
     $wx_username = $this->post('wx_username');
     $firmware_name = $this->post('firmware_name');
-    if (empty($wx_username) or empty($firmware_name))
+    $devicename = $this->post('devicename');
+
+    if (empty($wx_username) or empty($firmware_name) or empty($devicename))
     {
       $message = [
         'status' => '201',
         'wx_username' => $wx_username,
-        'firmware_name' => $firmware_name
+        'firmware_name' => $firmware_name,
+        'devicename' => $devicename
       ];
 
       $this->set_response($message, $message['status']);
       return;
     }
 
-    //设置你的AccessKeyId/AccessSecret/ProductKey
-    $accessKeyId = "LTAIwOrIrQK8GLc2";
-    $accessSecret = "kQ07a09Bm72qgAfLivTlxXhGfv2JDC";
-    $iClientProfile = DefaultProfile::getProfile("cn-shanghai", $accessKeyId, $accessSecret);
-    $client = new DefaultAcsClient($iClientProfile);
-
-    $request = new Iot\PubRequest();
-    $request->setProductKey("a1dSHKlSbBX");
-
     $url = base_url()."api/Downloader/get_firmware?filename=".$firmware_name;
+
     $content = [
       'cmd' => 'ota',
       'para' => [
@@ -160,10 +150,7 @@ class Device extends REST_Controller {
       ]
     ];
 
-    $request->setMessageContent(base64_encode(json_encode($content)));
-
-    $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
-    $response = $client->getAcsResponse($request);
+    $response = $this->send_message_by_iot($content,$devicename);
     // print_r($response);
 
     $message = [
@@ -180,30 +167,23 @@ class Device extends REST_Controller {
  public function check_machine_status_post()
   {
     $wx_username = $this->post('wx_username');
-    if (empty($wx_username))
+    $devicename = $this->post('devicename');
+
+    if (empty($wx_username) or empty($devicename))
     {
       $message = [
         'status' => '201',
-        'wx_username' => $wx_username
+        'wx_username' => $wx_username,
+        'devicename' => $devicename
       ];
 
       $this->set_response($message, $message['status']);
       return;
     }
 
-    //设置你的AccessKeyId/AccessSecret/ProductKey
-    $accessKeyId = "LTAIwOrIrQK8GLc2";
-    $accessSecret = "kQ07a09Bm72qgAfLivTlxXhGfv2JDC";
-    $iClientProfile = DefaultProfile::getProfile("cn-shanghai", $accessKeyId, $accessSecret);
-    $client = new DefaultAcsClient($iClientProfile);
+    $content = "Y2hlY2sgbWFjaGluZSBzdGF0dXM=";
 
-    $request = new Iot\PubRequest();
-    $request->setProductKey("a1dSHKlSbBX");
-  
-    $request->setMessageContent("Y2hlY2sgbWFjaGluZSBzdGF0dXM=");  //check machine status
-
-    $request->setTopicFullName("/a1dSHKlSbBX/test/get"); //消息发送到的Topic全名.
-    $response = $client->getAcsResponse($request);
+    $response = $this->send_message_by_iot($content,$devicename);
     // print_r($response);
 
     $message = [
@@ -215,4 +195,5 @@ class Device extends REST_Controller {
     $this->set_response($message, $message['status']);
 
   }
+
 }

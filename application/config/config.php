@@ -522,3 +522,20 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+
+// aliyun iot parameters
+$config['accessKeyId'] = '';
+$config['accessSecret'] = '';
+$config['ProductKey'] = '';
+
+
+// wechat pay parameters
+$config['appid'] = '';
+$config['secret'] = '';
+
+$config['merchantid'] = '';
+$config['apikey'] = '';
+$config['SERVER_ADDR'] = '';
+
+
