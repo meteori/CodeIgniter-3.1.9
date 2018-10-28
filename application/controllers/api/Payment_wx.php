@@ -109,7 +109,7 @@ class Payment_wx extends REST_Controller {
         'status' => '202',
         'openid' => $openid,
         'session_key' => $session_key,
-        'message' => $info
+        'message' => $json
       ];
 
       $this->set_response($message, $message['status']);
@@ -238,43 +238,43 @@ class Payment_wx extends REST_Controller {
       //统一下单接口prepay_id
       $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
       $xml = $this->http_request($url,$post_xml);     //POST方式请求http
-      $array = $this->xml2array($xml);               //将【统一下单】api返回xml数据转换成数组，全要大写
-      if($array['RETURN_CODE'] == 'SUCCESS' && $array['RESULT_CODE'] == 'SUCCESS'){
-          $time = time();
-          $tmp='';                            //临时数组用于签名
-          $tmp['appId'] = $appid;
-          $tmp['nonceStr'] = $nonce_str;
-          $tmp['package'] = 'prepay_id='.$array['PREPAY_ID'];
-          $tmp['signType'] = 'MD5';
-          $tmp['timeStamp'] = "$time";
+      // $array = $this->xml2array($xml);               //将【统一下单】api返回xml数据转换成数组，全要大写
+      // if($array['RETURN_CODE'] == 'SUCCESS' && $array['RESULT_CODE'] == 'SUCCESS'){
+      //     $time = time();
+      //     $tmp='';                            //临时数组用于签名
+      //     $tmp['appId'] = $appid;
+      //     $tmp['nonceStr'] = $nonce_str;
+      //     $tmp['package'] = 'prepay_id='.$array['PREPAY_ID'];
+      //     $tmp['signType'] = 'MD5';
+      //     $tmp['timeStamp'] = "$time";
   
-          $data['state'] = 1;
-          $data['timeStamp'] = "$time";           //时间戳
-          $data['nonceStr'] = $nonce_str;         //随机字符串
-          $data['signType'] = 'MD5';              //签名算法，暂支持 MD5
-          $data['package'] = 'prepay_id='.$array['PREPAY_ID'];   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
-          $data['paySign'] = $this->MakeSign($tmp,$KEY);       //签名,具体签名方案参见微信公众号支付帮助文档;
-          $data['out_trade_no'] = $out_trade_no;
+      //     $data['state'] = 1;
+      //     $data['timeStamp'] = "$time";           //时间戳
+      //     $data['nonceStr'] = $nonce_str;         //随机字符串
+      //     $data['signType'] = 'MD5';              //签名算法，暂支持 MD5
+      //     $data['package'] = 'prepay_id='.$array['PREPAY_ID'];   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
+      //     $data['paySign'] = $this->MakeSign($tmp,$KEY);       //签名,具体签名方案参见微信公众号支付帮助文档;
+      //     $data['out_trade_no'] = $out_trade_no;
   
-          $message = [
-            'status' => '200',
-            'data' => $data
-          ];
+      //     $message = [
+      //       'status' => '200',
+      //       'data' => $data
+      //     ];
 
-          $this->set_response($message, $message['status']);
-          return;
+      //     $this->set_response($message, $message['status']);
+      //     return;
 
-      }else{
-          $data['state'] = 0;
-          $data['text'] = "错误";
-          $data['RETURN_CODE'] = $array['RETURN_CODE'];
-          $data['RETURN_MSG'] = $array['RETURN_MSG'];
-      }
+      // }else{
+      //     $data['state'] = 0;
+      //     $data['text'] = "错误";
+      //     $data['return_code'] = $array['RETURN_CODE'];
+      //     $data['return_msg'] = $array['RETURN_MSG'];
+      // }
       // echo json_encode($data);
 
       $message = [
-        'status' => '201',
-        'data' => $data
+        'status' => '207',
+        'data' => $xml
       ];
 
       $this->set_response($message, $message['status']);
@@ -443,6 +443,8 @@ class Payment_wx extends REST_Controller {
   function randomkeys($length)
   {
     $pattern = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ'; //字符池
+    $key = '';
+
     for($i=0;$i<$length;$i++)
     {
       $key .= $pattern{mt_rand(0,35)}; //生成php随机数
