@@ -278,6 +278,7 @@ class Payment_wx extends REST_Controller {
       ];
 
       $this->set_response($message, $message['status']);
+      return;
   }
   
   /**
