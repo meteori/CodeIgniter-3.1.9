@@ -239,12 +239,23 @@ class Payment_wx extends REST_Controller {
       $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
       $xml = $this->http_request($url,$post_xml);     //POST方式请求http
       $array = $this->xml2array($xml);               //将【统一下单】api返回xml数据转换成数组，全要大写
+
+      if(!(isset($array['RETURN_CODE']) && isset($array['RESULT_CODE'])))
+      {
+          $message = [
+            'status' => '405'
+          ];
+
+          $this->set_response($message, $message['status']);
+          return;  
+      }
+
       if($array['RETURN_CODE'] == 'SUCCESS' && $array['RESULT_CODE'] == 'SUCCESS'){
           $time = time();
           $tmp='';                            //临时数组用于签名
           $tmp['appId'] = $appid;
           $tmp['nonceStr'] = $nonce_str;
-          $tmp['package'] = 'prepay_id='.$array['PREPAY_ID'];
+          $tmp['package'] = 'prepay_id='.isset($array['PREPAY_ID']) ?$array['PREPAY_ID']: '';
           $tmp['signType'] = 'MD5';
           $tmp['timeStamp'] = "$time";
   
@@ -252,7 +263,7 @@ class Payment_wx extends REST_Controller {
           $data['timeStamp'] = "$time";           //时间戳
           $data['nonceStr'] = $nonce_str;         //随机字符串
           $data['signType'] = 'MD5';              //签名算法，暂支持 MD5
-          $data['package'] = 'prepay_id='.$array['PREPAY_ID'];   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
+          $data['package'] = 'prepay_id='.isset($array['PREPAY_ID']) ?$array['PREPAY_ID']: '';   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
           $data['paySign'] = $this->MakeSign($tmp,$KEY);       //签名,具体签名方案参见微信公众号支付帮助文档;
           $data['out_trade_no'] = $out_trade_no;
   
@@ -267,12 +278,11 @@ class Payment_wx extends REST_Controller {
       }else{
           $data['state'] = 0;
           $data['text'] = "error";
-          $data['return_code'] = $array['RETURN_CODE'];
-          $data['return_msg'] = $array['RETURN_MSG'];
+          $data['return_code'] = isset($array['RETURN_CODE']) ?$array['RETURN_CODE']: '';
+          $data['return_msg'] = isset($array['RETURN_MSG']) ?$array['RETURN_MSG']: ''; //$array['RETURN_MSG'];
 
           $message = [
-            'status' => '404',
-            'data' => $data
+            'status' => '404'
           ];
 
           $this->set_response($message, $message['status']);          
@@ -346,12 +356,9 @@ class Payment_wx extends REST_Controller {
       $data = "";
       foreach ($index as $key=>$value) {
           if($key == 'xml' || $key == 'XML') continue;
-          if(is_array($vals))
-          {
-            $tag = $vals[$value[0]]['tag'];
-            $value = $vals[$value[0]]['value'];
-            $data[$tag] = $value;    
-          }
+          $tag = $vals[$value[0]]['tag'];
+          $value = $vals[$value[0]]['value'];
+          $data[$tag] = $value;
       }
       return $data;
   }
