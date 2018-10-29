@@ -139,10 +139,10 @@ class Payment_wx extends REST_Controller {
       ];
 
       $this->set_response($message, $message['status']);
-
+      return; 
     }
 
-    return; 
+    
   }
 
 /* 小程序报名，生成订单 */
