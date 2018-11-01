@@ -145,26 +145,6 @@ class Payment_wx extends REST_Controller {
     
   }
 
-/* 小程序报名，生成订单 */
-  // public function make_order_post(){
-  //   $data['openid'] = $this->post('openid');
-  //   $data_total = 1;  //0.01 rmb
-  //   $data['crsNo'] = 'W'.date('YmdHis',time()).'-'.randomkeys(2);
-  //   // $insertId = M('home_order','xxf_witkey_')->add($data);
-  //   $insertId = $this->terminals->insert_new_order($data);
-  //   if($insertId){
-  //       $this->insertID = $insertId;
-  //       $this->data_total = $data_total;  //订单总金额，单位分
-  //       /* 调用微信【统一下单】 */
-  //       $this->pay($data_total,$data['openid'],$data['crsNo']);
-  //   }else{
-  //       echo $insertId;
-  //   }
-  //   //echo json_encode($re);
-  // }
-  
-
-
 /* 首先在服务器端调用微信【统一下单】接口，返回prepay_id和sign签名等信息给前端，前端调用微信支付接口 */
   private function Pay($total_fee,$openid,$order_id){
       if(empty($total_fee)){
@@ -238,57 +218,49 @@ class Payment_wx extends REST_Controller {
       //统一下单接口prepay_id
       $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
       $xml = $this->http_request($url,$post_xml);     //POST方式请求http
-      $array = $this->xml2array($xml);               //将【统一下单】api返回xml数据转换成数组，全要大写
+      $array = $this->xml_to_array($xml);
 
-      if(!(isset($array['RETURN_CODE']) && isset($array['RESULT_CODE'])))
-      {
+      if (strval($array['result_code']) == 'FAIL') {
           $message = [
-            'status' => '405'
+            'status' => '405',
+            'message' => 'result_code FAIL'
           ];
 
           $this->set_response($message, $message['status']);
-          return;  
+          return;         
       }
-
-      if($array['RETURN_CODE'] == 'SUCCESS' && $array['RESULT_CODE'] == 'SUCCESS'){
-          $time = time();
-          $tmp='';                            //临时数组用于签名
-          $tmp['appId'] = $appid;
-          $tmp['nonceStr'] = $nonce_str;
-          $tmp['package'] = 'prepay_id='.isset($array['PREPAY_ID']) ?$array['PREPAY_ID']: '';
-          $tmp['signType'] = 'MD5';
-          $tmp['timeStamp'] = "$time";
-  
-          $data['state'] = 1;
-          $data['timeStamp'] = "$time";           //时间戳
-          $data['nonceStr'] = $nonce_str;         //随机字符串
-          $data['signType'] = 'MD5';              //签名算法，暂支持 MD5
-          $data['package'] = 'prepay_id='.isset($array['PREPAY_ID']) ?$array['PREPAY_ID']: '';   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
-          $data['paySign'] = $this->MakeSign($tmp,$KEY);       //签名,具体签名方案参见微信公众号支付帮助文档;
-          $data['out_trade_no'] = $out_trade_no;
-  
+      if (strval($array['return_code']) == 'FAIL') {
           $message = [
-            'status' => '200',
-            'data' => $data
+            'status' => '406',
+            'message' => 'return_code FAIL'
           ];
 
           $this->set_response($message, $message['status']);
-          return;
-
-      }else{
-          $data['state'] = 0;
-          $data['text'] = "error";
-          $data['return_code'] = isset($array['RETURN_CODE']) ?$array['RETURN_CODE']: '';
-          $data['return_msg'] = isset($array['RETURN_MSG']) ?$array['RETURN_MSG']: ''; //$array['RETURN_MSG'];
-
-          $message = [
-            'status' => '404'
-          ];
-
-          $this->set_response($message, $message['status']);          
+          return; 
       }
-      // echo json_encode($data);
 
+      $time = time();
+      $tmp = array();                            //临时数组用于签名
+      $tmp['appId'] = $appid;
+      $tmp['nonceStr'] = $nonce_str;
+      $tmp['package'] = 'prepay_id='.isset($array['prepay_id']) ?$array['prepay_id']: '';
+      $tmp['signType'] = 'MD5';
+      $tmp['timeStamp'] = "$time";
+
+      $data['state'] = 1;
+      $data['timeStamp'] = "$time";           //时间戳
+      $data['nonceStr'] = $nonce_str;         //随机字符串
+      $data['signType'] = 'MD5';              //签名算法，暂支持 MD5
+      $data['package'] = 'prepay_id='.isset($array['prepay_id']) ?$array['prepay_id']: '';   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
+      $data['paySign'] = $this->MakeSign($tmp,$KEY);       //签名,具体签名方案参见微信公众号支付帮助文档;
+      $data['out_trade_no'] = $out_trade_no;
+
+      $message = [
+        'status' => '200',
+        'data' => $data
+      ];
+
+      $this->set_response($message, $message['status']);
       return;
   }
   
@@ -347,20 +319,6 @@ class Payment_wx extends REST_Controller {
       $output = curl_exec($curl);
       curl_close($curl);
       return $output;
-  }
-  //获取xml里面数据，转换成array
-  private function xml2array($xml){
-      $p = xml_parser_create();
-      xml_parse_into_struct($p, $xml, $vals, $index);
-      xml_parser_free($p);
-      $data = "";
-      foreach ($index as $key=>$value) {
-          if($key == 'xml' || $key == 'XML') continue;
-          $tag = $vals[$value[0]]['tag'];
-          $value = $vals[$value[0]]['value'];
-          $data[$tag] = $value;
-      }
-      return $data;
   }
 
   /**
