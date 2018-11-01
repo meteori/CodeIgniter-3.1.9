@@ -117,7 +117,7 @@ class Payment_wx extends REST_Controller {
     }
  
     $data['openid'] = $openid;
-    $data_total = 1;  //0.01 rmb
+    $data_total = '1';  //0.01 rmb
     $data['crsNo'] = 'W'.date('YmdHis',time()).'-'.$this->randomkeys(2);
     // $insertId = M('home_order','xxf_witkey_')->add($data);
     $insertId = $this->Payment_model->insert_new_order($data);
@@ -243,7 +243,7 @@ class Payment_wx extends REST_Controller {
       $tmp = array();                            //临时数组用于签名
       $tmp['appId'] = $appid;
       $tmp['nonceStr'] = $nonce_str;
-      $tmp['package'] = 'prepay_id='.isset($array['prepay_id']) ?$array['prepay_id']: '';
+      $tmp['package'] = 'prepay_id='.$array['prepay_id'];
       $tmp['signType'] = 'MD5';
       $tmp['timeStamp'] = "$time";
 
@@ -251,7 +251,7 @@ class Payment_wx extends REST_Controller {
       $data['timeStamp'] = "$time";           //时间戳
       $data['nonceStr'] = $nonce_str;         //随机字符串
       $data['signType'] = 'MD5';              //签名算法，暂支持 MD5
-      $data['package'] = 'prepay_id='.isset($array['prepay_id']) ?$array['prepay_id']: '';   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
+      $data['package'] = 'prepay_id='.$array['prepay_id'];   //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
       $data['paySign'] = $this->MakeSign($tmp,$KEY);       //签名,具体签名方案参见微信公众号支付帮助文档;
       $data['out_trade_no'] = $out_trade_no;
 
