@@ -37,9 +37,9 @@ class Picshow extends REST_Controller {
                   continue;
                 } else { //不然就将文件的名字存入数组；
                     // $files[] = $file;
-                    //prepare data
-                    $picUrl = base_url().'static/images/xxxshow/'.$file;
-                    $image = base_url().'static/images/xxxshow/bg/xxxshow_bg.jpg';
+                    //prepare data;
+                    $image = base_url().'static/images/xxxshow/'.$file;
+                    $picUrl = base_url().'static/images/xxxshow/bg/xxxshow_bg.jpg';
                     $data = [
                       "name"=> "精品饰品", 
                       "desc"=> "精品饰品", 
