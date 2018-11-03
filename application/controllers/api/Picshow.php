@@ -39,7 +39,7 @@ class Picshow extends REST_Controller {
                     // $files[] = $file;
                     //prepare data;
                     $image = base_url().'static/images/xxxshow/'.$file;
-                    $picUrl = base_url().'static/images/xxxshow/bg/xxxshow_bg.jpg';
+                    $picUrl = base_url().'static/images/xxxshow/bg/xxxshow_bg.jpeg';
                     $data = [
                       "name"=> "精品饰品", 
                       "desc"=> "精品饰品", 
