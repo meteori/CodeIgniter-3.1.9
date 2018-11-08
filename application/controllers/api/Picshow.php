@@ -22,54 +22,60 @@ class Picshow extends REST_Controller {
 
     $this->load->helper('url');
   	$this->load->helper('download');//加载插件
+    $this->load->model('XXXProducts');
   }
 
-  public function get_detail_get()
+  public function get_products_detail_get()
   {
-    $dir = './static/images/xxxshow';
+    $type = $this->get('type');   //new, necklace, earrings, rings
+    $dir = './static/images/xxxshow/'.$type;
     $datas = array();
     // $files = array();
     if(@$handle = opendir($dir)) { //注意这里要加一个@，不然会有warning错误提示：）
-        while(($file = readdir($handle)) != false) {
-            if($file != ".." && $file != ".") { //排除根目录；
-                if(is_dir($dir."/".$file)) { //如果是子文件夹，就跳过
-                    // $files[$file] = my_dir($dir."/".$file);
-                  continue;
-                } else { //不然就将文件的名字存入数组；
-                    // $files[] = $file;
-                    //prepare data;
-                    $image = base_url().'static/images/xxxshow/'.$file;
-                    $picUrl = base_url().'static/images/xxxshow/bg/xxxshow_bg.jpeg';
-                    $data = [
-                      "name"=> "精品饰品", 
-                      "desc"=> "精品饰品", 
-                      "picUrl"=> $picUrl, 
-                      "image"=> $image, 
-                      "jumpType"=> "subjectPage", 
-                      "subjectId"=> 0, 
-                      "playUrl"=> "", 
-                      "icon"=> "", 
-                      "tag"=> "", 
-                      "videoId"=> 0, 
-                      "hotDegree"=> "", 
-                      "hotType"=> "", 
-                      "playTimeIconUrl"=> "", 
-                      "webUrl"=> "", 
-                      "splitItem"=> "", 
-                      "canShare"=> 0, 
-                      "ext"=> 0, 
-                      "libId"=> 0, 
-                      "activityId"=> 0, 
-                      "isFavorite"=> 0, 
-                      "admireCount"=> 0
-                    ];
-                    $datas[] = $data;
-                }
- 
-            }
-        }
-        closedir($handle);
-        // return $files;
+      while(($file = readdir($handle)) != false) {
+          if($file != ".." && $file != ".") { //排除根目录；
+              if(is_dir($dir."/".$file)) { //如果是子文件夹，就跳过
+                  // $files[$file] = my_dir($dir."/".$file);
+                continue;
+              } else { //不然就将文件的名字存入数组；
+                  // $files[] = $file;
+                  //prepare data;
+                  $product = $this->XXXProducts->get_products_by_filename($file);
+                  if($product == NULL)
+                    continue;
+
+                  $image = base_url().'static/images/xxxshow/'.$type.'/'.$file;
+                  $picUrl = base_url().'static/images/xxxshow/bg/'.$product->bg_image;
+                  $data = [
+                    "name"=> $product->title, 
+                    "desc"=> $product->desc, 
+                    "picUrl"=> $picUrl, 
+                    "image"=> $image, 
+                    "jumpType"=> "subjectPage", 
+                    "subjectId"=> 0, 
+                    "playUrl"=> $product->playurl, 
+                    "icon"=> "", 
+                    "tag"=> "", 
+                    "videoId"=> 0, 
+                    "hotDegree"=> "", 
+                    "hotType"=> "", 
+                    "playTimeIconUrl"=> "", 
+                    "webUrl"=> "", 
+                    "splitItem"=> "", 
+                    "canShare"=> 0, 
+                    "ext"=> 0, 
+                    "libId"=> 0, 
+                    "activityId"=> 0, 
+                    "isFavorite"=> 0, 
+                    "admireCount"=> 0
+                  ];
+                  $datas[] = $data;
+              }
+
+          }
+      }
+      closedir($handle);
+      // return $files;
     }
 
     $message = [
@@ -82,6 +88,12 @@ class Picshow extends REST_Controller {
     ];
 
     $this->set_response($message, $message['code']);
+
+  }
+
+  public function upload_product_post()
+  {
+
 
   }
 

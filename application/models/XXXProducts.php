@@ -3,17 +3,17 @@
 /**
 * Payment model.
 * @author Vim Ji <vim.jxl@gmail.com>
-* Date Created: 2018-10-28
+* Date Created: 2018-11-06
 */
 
 
-class Payment_model extends CI_Model {
+class XXXProducts extends CI_Model {
 
   function __construct()
   {
     parent::__construct();
     $this->db = $this->load->database('anlun', TRUE);
-    $this->table_name = 'order_wx';
+    $this->table_name = 'xxx_products';
 
   }
 
@@ -27,9 +27,9 @@ class Payment_model extends CI_Model {
     return 0;
   }
 
-  public function search_order($crsNo)
+  public function get_products_by_filename($filename)
   {
-    $this->db->where('crsNo',$crsNo);
+    $this->db->where('file_name',$filename);
     $query = $this->db->get($this->table_name);
     // return $query->result();
     if ($query->num_rows() >= 1) return $query->row();
