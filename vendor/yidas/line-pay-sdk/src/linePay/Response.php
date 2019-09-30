@@ -44,7 +44,15 @@ class Response implements \ArrayAccess
     {
         // Cache
         if (!$this->bodyArrayCache) {
-            $this->bodyArrayCache = json_decode($this->response->getBody(), true, 512, JSON_BIGINT_AS_STRING );
+            // ********************************************************
+            // KNOWN BUG OF JSON_BIGINT_AS_STRING IN PHP 5.5
+            // FIX START
+            // ********************************************************
+                $options = ( version_compare(PHP_VERSION, '5.4.0', '>=') and ! (defined('JSON_C_VERSION') and PHP_INT_SIZE > 4) ) ? JSON_BIGINT_AS_STRING : 0;
+            // ********************************************************
+            // FIX END
+            // ********************************************************
+            $this->bodyArrayCache = json_decode($this->response->getBody(), true, 512, $options );
         }
 
         return $this->bodyArrayCache;
@@ -59,7 +67,15 @@ class Response implements \ArrayAccess
     {
         // Cache
         if (!$this->bodyObjectCache) {
-            $this->bodyObjectCache = json_decode($this->response->getBody(), false, 512, JSON_BIGINT_AS_STRING );
+            // ********************************************************
+            // KNOWN BUG OF JSON_BIGINT_AS_STRING IN PHP 5.5
+            // FIX START
+            // ********************************************************
+                $options = ( version_compare(PHP_VERSION, '5.4.0', '>=') and ! (defined('JSON_C_VERSION') and PHP_INT_SIZE > 4) ) ? JSON_BIGINT_AS_STRING : 0;
+            // ********************************************************
+            // FIX END
+            // ********************************************************
+            $this->bodyObjectCache = json_decode($this->response->getBody(), false, 512, $options );
         }
 
         return $this->bodyObjectCache;

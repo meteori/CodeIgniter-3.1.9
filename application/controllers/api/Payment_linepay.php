@@ -8,6 +8,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . 'libraries/REST_Controller.php';
 require APPPATH . 'libraries/Format.php';
 
+require 'vendor/autoload.php';
+
+use yidas\linePay\Client;
+
 /**
 * Payment_wx API.
 * @author Vim Ji <vim.jxl@gmail.com>
@@ -18,8 +22,68 @@ class Payment_linepay extends REST_Controller {
   function __construct()
   {
     parent::__construct();
+  }
 
-    $this->load->library('Linepay/Client');
+  public function test_guzzle_post()
+  {
+    $client = new \GuzzleHttp\Client();
+    $response = $client->request('GET', 'https://api.github.com/repos/guzzle/guzzle');
+
+    echo $response->getStatusCode(); # 200
+    echo $response->getHeaderLine('content-type'); # 'application/json; charset=utf8'
+    echo $response->getBody(); # '{"id": 1420053, "name": "guzzle", ...}'
+
+    # Send an asynchronous request.
+    $request = new \GuzzleHttp\Psr7\Request('GET', 'http://httpbin.org');
+    $promise = $client->sendAsync($request)->then(function ($response) {
+      echo 'I completed! ' . $response->getBody();
+    });
+
+    $promise->wait();
+  }
+
+  public function demo_line_pay_sdk_post()
+  {
+    // Create LINE Pay client
+    $linePay = new \yidas\linePay\Client([
+        'channelId' => '123456',
+        'channelSecret' => '123456',
+        'isSandbox' => true, 
+    ]);
+
+    // Online Request API
+    $response = $linePay->request([
+        'amount' => 250,
+        'currency' => 'TWD',
+        'orderId' => 'Your order ID',
+        'packages' => [
+            [
+                'id' => 'Your package ID',
+                'amount' => 250,
+                'name' => 'Your package name',
+                'products' => [
+                    [
+                        'name' => 'Your product name',
+                        'quantity' => 1,
+                        'price' => 250,
+                        'imageUrl' => 'https://yourname.com/assets/img/product.png',
+                    ],
+                ],
+            ],
+        ],
+        'redirectUrls' => [
+            'confirmUrl' => 'https://yourname.com/line-pay/confirm',
+            'cancelUrl' => 'https://yourname.com/line-pay/cancel',
+        ],
+    ]);
+
+    // Check Request API result (returnCode "0000" check method)
+    if (!$response->isSuccessful()) {
+        throw new Exception("ErrorCode {$response['returnCode']}: {$response['returnMessage']}");
+    }
+
+    // Redirect to LINE Pay payment URL 
+    header('Location: '. $response->getPaymentUrl() );
   }
 
   public function request_post()
